@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title></title>
+    <meta name="description" content="H5 Portal" />
+    <style>
+      html {
+        background: #06111f;
+        color: #f5f8ff;
+      }
+
+      html[data-theme='light'] {
+        background: #eef3fb;
+        color: #0f172a;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(111, 140, 255, 0.28), transparent 32%),
+          radial-gradient(circle at 82% 12%, rgba(85, 215, 255, 0.18), transparent 26%),
+          linear-gradient(180deg, #06111f 0%, #081527 56%, #091221 100%);
+        color: inherit;
+      }
+
+      html[data-theme='light'] body {
+        background:
+          radial-gradient(circle at 10% -8%, rgba(109, 148, 255, 0.24), transparent 30%),
+          radial-gradient(circle at 92% 0%, rgba(100, 198, 255, 0.18), transparent 26%),
+          linear-gradient(180deg, #f6faff 0%, #eef5ff 48%, #e4edfb 100%);
+      }
+
+      #app {
+        min-height: 100vh;
+      }
+
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: inherit;
+        z-index: 9999;
+        transition: opacity .24s ease;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(88, 116, 255, .22), transparent 35%),
+          radial-gradient(circle at 80% 20%, rgba(93, 222, 255, .16), transparent 30%),
+          linear-gradient(180deg, rgba(7, 24, 51, .96) 0%, rgba(4, 18, 36, .98) 100%);
+      }
+
+      html[data-theme='light'] #boot-splash {
+        background:
+          radial-gradient(circle at 12% 10%, rgba(111, 140, 255, .18), transparent 30%),
+          radial-gradient(circle at 85% 12%, rgba(14, 165, 233, .14), transparent 24%),
+          linear-gradient(180deg, rgba(248, 251, 255, .98) 0%, rgba(236, 243, 255, .98) 100%);
+      }
+
+      .boot-shell {
+        width: min(100%, 340px);
+        display: grid;
+        gap: 16px;
+      }
+
+      .boot-shell-card {
+        padding: 22px;
+        border-radius: 28px;
+        border: 1px solid rgba(162, 180, 233, 0.16);
+        background: rgba(10, 20, 39, 0.54);
+        box-shadow: 0 20px 60px rgba(0, 8, 25, 0.28);
+        backdrop-filter: blur(14px);
+      }
+
+      html[data-theme='light'] .boot-shell-card {
+        border-color: rgba(86, 110, 166, 0.14);
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 20px 56px rgba(94, 110, 150, 0.14);
+      }
+
+      .boot-shell-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      .boot-shell-badge,
+      #boot-splash-logo-image {
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
+        flex: 0 0 auto;
+      }
+
+      #boot-splash-logo-image {
+        display: none;
+        object-fit: cover;
+        box-shadow: 0 12px 36px rgba(67, 199, 255, .25);
+      }
+
+      .boot-shell-badge {
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #6d84ff, #43c7ff);
+        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+        box-shadow: 0 12px 36px rgba(67, 199, 255, .25);
+      }
+
+      .boot-shell-copy {
+        min-width: 0;
+      }
+
+      .boot-shell-copy strong,
+      .boot-shell-copy p {
+        display: block;
+        margin: 0;
+      }
+
+      .boot-shell-copy strong {
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .boot-shell-copy p {
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: .82;
+      }
+
+      .boot-shell-lines {
+        display: grid;
+        gap: 12px;
+      }
+
+      .boot-shell-line,
+      .boot-shell-grid span {
+        position: relative;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      html[data-theme='light'] .boot-shell-line,
+      html[data-theme='light'] .boot-shell-grid span {
+        background: rgba(148, 163, 184, 0.18);
+      }
+
+      .boot-shell-line::after,
+      .boot-shell-grid span::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+        animation: bootShimmer 1.2s linear infinite;
+      }
+
+      html[data-theme='light'] .boot-shell-line::after,
+      html[data-theme='light'] .boot-shell-grid span::after {
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+      }
+
+      .boot-shell-line {
+        height: 12px;
+      }
+
+      .boot-shell-line.short {
+        width: 42%;
+      }
+
+      .boot-shell-line.medium {
+        width: 68%;
+      }
+
+      .boot-shell-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .boot-shell-grid span {
+        display: block;
+        height: 84px;
+        border-radius: 20px;
+      }
+
+      #boot-static-login {
+        display: none;
+        min-height: 100vh;
+        box-sizing: border-box;
+        padding:
+          max(20px, env(safe-area-inset-top))
+          18px
+          max(20px, env(safe-area-inset-bottom));
+      }
+
+      html[data-boot-route='login'] #boot-static-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      html[data-boot-route='login'] #boot-splash {
+        display: none;
+      }
+
+      .boot-auth-shell {
+        width: min(100%, 392px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .boot-auth-card {
+        padding: 24px 20px 20px;
+        border-radius: 30px;
+        border: 1px solid rgba(162, 180, 233, 0.16);
+        background: rgba(10, 20, 39, 0.56);
+        box-shadow: 0 20px 60px rgba(0, 8, 25, 0.24);
+        backdrop-filter: blur(14px);
+      }
+
+      html[data-theme='light'] .boot-auth-card {
+        border-color: rgba(86, 110, 166, 0.14);
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 20px 56px rgba(94, 110, 150, 0.14);
+      }
+
+      .boot-auth-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .boot-auth-logo,
+      #boot-auth-logo-image {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        flex: 0 0 auto;
+      }
+
+      #boot-auth-logo-image {
+        display: none;
+        object-fit: cover;
+        box-shadow: 0 12px 36px rgba(67, 199, 255, 0.22);
+      }
+
+      .boot-auth-logo {
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #6d84ff, #43c7ff);
+        color: #fff;
+        font-size: 19px;
+        font-weight: 800;
+        box-shadow: 0 12px 36px rgba(67, 199, 255, 0.22);
+      }
+
+      .boot-auth-copy {
+        min-width: 0;
+      }
+
+      .boot-auth-copy strong,
+      .boot-auth-copy p {
+        display: block;
+        margin: 0;
+      }
+
+      .boot-auth-copy strong {
+        font-size: 19px;
+        line-height: 1.35;
+      }
+
+      .boot-auth-copy p {
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: .82;
+      }
+
+      .boot-auth-body {
+        display: grid;
+        gap: 14px;
+      }
+
+      .boot-auth-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        opacity: .72;
+      }
+
+      .boot-auth-input,
+      .boot-auth-submit,
+      .boot-auth-switch-line {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .boot-auth-input {
+        height: 52px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      html[data-theme='light'] .boot-auth-input {
+        background: rgba(148, 163, 184, 0.16);
+      }
+
+      .boot-auth-submit {
+        height: 48px;
+        margin-top: 4px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(109, 132, 255, 0.92), rgba(67, 199, 255, 0.88));
+      }
+
+      .boot-auth-switch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .boot-auth-switch-line {
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      html[data-theme='light'] .boot-auth-switch-line {
+        background: rgba(148, 163, 184, 0.18);
+      }
+
+      .boot-auth-switch-line.left {
+        width: 36%;
+      }
+
+      .boot-auth-switch-line.right {
+        width: 24%;
+      }
+
+      .boot-auth-input::after,
+      .boot-auth-submit::after,
+      .boot-auth-switch-line::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+        animation: bootShimmer 1.2s linear infinite;
+      }
+
+      html[data-theme='light'] .boot-auth-input::after,
+      html[data-theme='light'] .boot-auth-submit::after,
+      html[data-theme='light'] .boot-auth-switch-line::after {
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+      }
+
+      @keyframes bootShimmer {
+        100% {
+          transform: translateX(100%);
+        }
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var mode = window.localStorage.getItem('tp8_theme_mode') || 'system'
+          var resolved = mode === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+            : mode
+          document.documentElement.dataset.themeMode = mode
+          document.documentElement.dataset.theme = resolved
+        } catch (error) {
+          document.documentElement.dataset.themeMode = 'system'
+          document.documentElement.dataset.theme = 'dark'
+        }
+      })()
+    </script>
+    <script>
+      (function () {
+        var pathname = String(window.location.pathname || '/').trim() || '/'
+        var normalizedPath = pathname.replace(/\/+$/, '') || '/'
+        var bootRoute = normalizedPath === '/login' ? 'login' : 'default'
+        document.documentElement.dataset.bootRoute = bootRoute
+        window.__QD_BOOT_ROUTE__ = bootRoute
+      })()
+    </script>
+    <script>
+      window.__TP8_API_BASE__ = typeof window.__TP8_API_BASE__ === 'string' ? window.__TP8_API_BASE__ : ''
+      window.__TP8_FILE_BASE__ = typeof window.__TP8_FILE_BASE__ === 'string' ? window.__TP8_FILE_BASE__ : ''
+      window.__TP8_REGION_API_ENABLED__ = typeof window.__TP8_REGION_API_ENABLED__ === 'boolean' ? window.__TP8_REGION_API_ENABLED__ : true
+      window.__TP8_DEFAULT_SITE_NAME__ = typeof window.__TP8_DEFAULT_SITE_NAME__ === 'string' && window.__TP8_DEFAULT_SITE_NAME__.trim()
+        ? window.__TP8_DEFAULT_SITE_NAME__.trim()
+        : '\u6c47\u5145\u7ad9'
+    </script>
+    <script defer src="/runtime-config.js"></script>
+    <script>
+      (function () {
+        var DEFAULT_SITE_NAME = String(window.__TP8_DEFAULT_SITE_NAME__ || '').trim() || '\u6c47\u5145\u7ad9'
+        var SITE_CONTEXT_CACHE_KEY = 'tp8-site-context-v1'
+        var HOME_BOOTSTRAP_CACHE_KEY = 'tp8-home-bootstrap-v16'
+        var HOME_FIRST_SCREEN_CACHE_KEY = 'tp8-home-first-screen-v1'
+
+        function readCache(key) {
+          try {
+            return JSON.parse(window.localStorage.getItem(key) || 'null') || {}
+          } catch (error) {
+            return {}
+          }
+        }
+
+        function writeCache(key, value) {
+          try {
+            window.localStorage.setItem(key, JSON.stringify(value || {}))
+          } catch (error) {
+            // ignore cache errors during early boot
+          }
+        }
+
+        function resolveApiPath(path) {
+          var base = String(window.__TP8_API_BASE__ || '').trim().replace(/\/$/, '')
+          if (!base) return path
+          return base + path
+        }
+
+        function syncGetJson(path, query) {
+          try {
+            var search = new URLSearchParams(query || {})
+            search.set('_', String(Date.now()))
+            var url = resolveApiPath(path) + (search.toString() ? ('?' + search.toString()) : '')
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET', url, false)
+            xhr.withCredentials = true
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+            xhr.send(null)
+            if (xhr.status < 200 || xhr.status >= 300 || !xhr.responseText) return {}
+            var parsed = JSON.parse(xhr.responseText)
+            return parsed && typeof parsed === 'object' ? (parsed.data || parsed) : {}
+          } catch (error) {
+            return {}
+          }
+        }
+
+        function resolveTrustedSiteName(siteContext, homeCache) {
+          var contextName = String(siteContext.site_name || '').trim()
+          if (contextName) return contextName
+
+          var homeName = String(homeCache.siteName || '').trim()
+          if (homeName) return homeName
+
+          return String(homeCache.name || homeCache.site_name || '').trim()
+        }
+
+        var host = String(window.location.host || 'default').trim().toLowerCase() || 'default'
+        var siteContextKey = SITE_CONTEXT_CACHE_KEY + ':' + host
+        var homeBootstrapKey = HOME_BOOTSTRAP_CACHE_KEY + ':' + host
+        var homeFirstScreenKey = HOME_FIRST_SCREEN_CACHE_KEY + ':' + host
+        var siteContext = readCache(siteContextKey)
+        var homeCache = readCache(homeFirstScreenKey)
+        if (!homeCache || !Object.keys(homeCache).length) {
+          homeCache = readCache(homeBootstrapKey)
+        }
+
+        if (!resolveTrustedSiteName(siteContext, homeCache)) {
+          var remoteContext = syncGetJson('/api/site/substation/context')
+          if (remoteContext && typeof remoteContext === 'object' && Object.keys(remoteContext).length) {
+            siteContext = remoteContext
+            writeCache(siteContextKey, remoteContext)
+          }
+        }
+
+        if (!resolveTrustedSiteName(siteContext, homeCache)) {
+          var remoteHome = syncGetJson('/api/site/config', {
+            scene: 'home_first_screen',
+            summary: 1,
+            lite: 1
+          })
+          var remoteSiteName = String(
+            (remoteHome && (remoteHome.siteName || remoteHome.site_name || remoteHome.name || remoteHome.website_name || remoteHome.web_name)) || ''
+          ).trim()
+          if (remoteSiteName) {
+            homeCache = Object.assign({}, homeCache, {
+              siteName: remoteSiteName,
+              notice: String((remoteHome && remoteHome.notice) || homeCache.notice || '').trim(),
+              logo: String((remoteHome && remoteHome.logo) || homeCache.logo || '').trim(),
+              updatedAt: Date.now(),
+              source: 'head-sync'
+            })
+            writeCache(homeFirstScreenKey, homeCache)
+            writeCache(homeBootstrapKey, homeCache)
+          }
+        }
+
+        var siteName = resolveTrustedSiteName(siteContext, homeCache) || ''
+        var notice = String(siteContext.notice || homeCache.notice || '').trim()
+        var logo = String(siteContext.logo || homeCache.logo || '').trim()
+        var badgeText = siteName.slice(0, 1) || '\u00A0'
+
+        window.__QD_BOOT_BRAND__ = {
+          siteName: siteName,
+          notice: notice,
+          logo: logo,
+          badgeText: badgeText
+        }
+
+        document.title = siteName || ''
+        var description = document.querySelector('meta[name="description"]')
+        if (description && siteName) description.setAttribute('content', siteName + ' H5 Portal')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="boot-splash">
+      <div class="boot-shell">
+        <div class="boot-shell-card">
+          <div class="boot-shell-head">
+            <img id="boot-splash-logo-image" alt="站点 Logo" />
+            <div id="boot-splash-logo-badge" class="boot-shell-badge">站</div>
+            <div class="boot-shell-copy">
+              <strong id="boot-splash-title">&nbsp;</strong>
+              <p id="boot-splash-notice">&nbsp;</p>
+            </div>
+          </div>
+          <div class="boot-shell-lines">
+            <div class="boot-shell-line"></div>
+            <div class="boot-shell-line medium"></div>
+            <div class="boot-shell-line short"></div>
+          </div>
+        </div>
+        <div class="boot-shell-card">
+          <div class="boot-shell-grid">
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var brand = window.__QD_BOOT_BRAND__ || {}
+        var titleEl = document.getElementById('boot-splash-title')
+        var noticeEl = document.getElementById('boot-splash-notice')
+        var badgeEl = document.getElementById('boot-splash-logo-badge')
+        var authTitleEl = document.getElementById('boot-auth-site-title')
+        var authBadgeEl = document.getElementById('boot-auth-logo-badge')
+
+        if (titleEl && brand.siteName) titleEl.textContent = brand.siteName
+        if (noticeEl && brand.notice) noticeEl.textContent = brand.notice
+        if (badgeEl && brand.badgeText) badgeEl.textContent = brand.badgeText
+        if (authTitleEl && brand.siteName) authTitleEl.textContent = brand.siteName
+        if (authBadgeEl && brand.badgeText) authBadgeEl.textContent = brand.badgeText
+      })()
+    </script>
+    <div id="app">
+      <section id="boot-static-login">
+        <div class="boot-auth-shell">
+          <div class="boot-auth-card">
+            <div class="boot-auth-head">
+              <img id="boot-auth-logo-image" alt="站点 Logo" />
+              <div id="boot-auth-logo-badge" class="boot-auth-logo">站</div>
+              <div class="boot-auth-copy">
+                <strong id="boot-auth-site-title">&nbsp;</strong>
+                <p>欢迎登录账户</p>
+              </div>
+            </div>
+            <div class="boot-auth-body" aria-hidden="true">
+              <div>
+                <span class="boot-auth-label">账号</span>
+                <div class="boot-auth-input"></div>
+              </div>
+              <div>
+                <span class="boot-auth-label">密码</span>
+                <div class="boot-auth-input"></div>
+              </div>
+              <div class="boot-auth-submit"></div>
+              <div class="boot-auth-switch">
+                <div class="boot-auth-switch-line left"></div>
+                <div class="boot-auth-switch-line right"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script>
+      (function () {
+        function readCache(key) {
+          try {
+            return JSON.parse(window.localStorage.getItem(key) || 'null') || {}
+          } catch (error) {
+            return {}
+          }
+        }
+
+        function resolveTrustedSiteName(siteContext, homeCache) {
+          var contextName = String(siteContext.site_name || '').trim()
+          if (contextName) return contextName
+
+          var homeName = String(homeCache.siteName || '').trim()
+          if (homeName) return homeName
+
+          return String(homeCache.name || homeCache.site_name || '').trim()
+        }
+
+        function normalizeAssetUrl(path) {
+          var raw = String(path || '').trim()
+          if (!raw) return ''
+          if (/^(data:|blob:|https?:)?\/\//i.test(raw)) return raw
+
+          var normalizedPath = raw.charAt(0) === '/' ? raw : '/' + raw
+          var fileBase = String(window.__TP8_FILE_BASE__ || window.__TP8_API_BASE__ || '/tp8api').trim().replace(/\/$/, '')
+          if (!fileBase) return normalizedPath
+
+          if (normalizedPath.indexOf('/assets/') === 0 || normalizedPath.indexOf('/favicon') === 0 || normalizedPath.indexOf('/robots.txt') === 0 || normalizedPath.indexOf('/tp8api/') === 0) {
+            return normalizedPath
+          }
+
+          if (/^\/(storage|uploads|upload|picture|images|image|avatar)\//.test(normalizedPath)) {
+            return fileBase + normalizedPath
+          }
+
+          return normalizedPath
+        }
+
+        function ensureIconLink(rel) {
+          if (!document.head) return null
+          var normalizedRel = String(rel || '').trim()
+          if (!normalizedRel) return null
+
+          var selector = 'link[rel="' + normalizedRel + '"]'
+          var link = document.head.querySelector(selector)
+          if (!link) {
+            link = document.createElement('link')
+            link.rel = normalizedRel
+            document.head.appendChild(link)
+          }
+
+          return link
+        }
+
+        function applyFavicon(path) {
+          var href = normalizeAssetUrl(path) || '/favicon.ico'
+
+          var iconLink = ensureIconLink('icon')
+          if (iconLink) {
+            iconLink.href = href
+            iconLink.type = 'image/x-icon'
+          }
+
+          var shortcutIconLink = ensureIconLink('shortcut icon')
+          if (shortcutIconLink) {
+            shortcutIconLink.href = href
+            shortcutIconLink.type = 'image/x-icon'
+          }
+
+          var appleTouchIconLink = ensureIconLink('apple-touch-icon')
+          if (appleTouchIconLink) {
+            appleTouchIconLink.href = href
+          }
+        }
+
+        function ensureHeadLink(rel, href, attributes) {
+          if (!href || !document.head) return null
+          var normalizedHref
+          try {
+            normalizedHref = new URL(href, window.location.origin).href
+          } catch (error) {
+            normalizedHref = href
+          }
+
+          var existing = Array.prototype.find.call(document.head.querySelectorAll('link[rel="' + rel + '"]'), function (link) {
+            return link.href === normalizedHref || link.getAttribute('href') === href
+          })
+          if (existing) return existing
+
+          var link = document.createElement('link')
+          link.rel = rel
+          link.href = href
+          Object.entries(attributes || {}).forEach(function (entry) {
+            if (entry[1] === undefined || entry[1] === null || entry[1] === '') return
+            link.setAttribute(entry[0], String(entry[1]))
+          })
+          document.head.appendChild(link)
+          return link
+        }
+
+        function warmConnection(url) {
+          if (!url || url.indexOf('data:') === 0 || url.indexOf('blob:') === 0) return
+          try {
+            var origin = new URL(url, window.location.origin).origin
+            ensureHeadLink('dns-prefetch', origin)
+            ensureHeadLink('preconnect', origin, { crossorigin: '' })
+          } catch (error) {
+            // ignore
+          }
+        }
+
+        function warmImage(url, priority) {
+          if (!url) return
+          warmConnection(url)
+          ensureHeadLink('preload', url, { as: 'image', fetchpriority: priority || 'auto' })
+          var image = new Image()
+          if ('fetchPriority' in image) image.fetchPriority = priority || 'auto'
+          image.decoding = 'async'
+          image.src = url
+          if (typeof image.decode === 'function') {
+            image.decode().catch(function () { return null })
+          }
+        }
+
+        function warmHomeImages(payload) {
+          var queue = []
+          function pushImage(value) {
+            var url = normalizeAssetUrl(value)
+            if (!url || queue.indexOf(url) !== -1) return
+            queue.push(url)
+          }
+
+          pushImage(payload && payload.logo)
+          pushImage(payload && payload.slides && payload.slides[0] && payload.slides[0].image)
+          ;(Array.isArray(payload && payload.featuredProducts) ? payload.featuredProducts : []).slice(0, 2).forEach(function (item) {
+            pushImage(item && item.image)
+          })
+          ;(Array.isArray(payload && payload.allProducts) ? payload.allProducts : []).slice(0, 2).forEach(function (item) {
+            pushImage(item && item.image)
+          })
+
+          queue.forEach(function (url, index) {
+            warmImage(url, index < 2 ? 'high' : 'auto')
+          })
+        }
+
+        function shouldWarmHomeAssets() {
+          var pathname = String(window.location.pathname || '/').trim() || '/'
+          return pathname === '/' || pathname === '/index.html'
+        }
+
+        warmConnection(String(window.__TP8_FILE_BASE__ || window.__TP8_API_BASE__ || '').trim())
+
+        var host = String(window.location.host || 'default').trim().toLowerCase() || 'default'
+        var siteContext = readCache('tp8-site-context-v1:' + host)
+        var homeCache = readCache('tp8-home-first-screen-v1:' + host)
+        if (!homeCache || !Object.keys(homeCache).length) {
+          homeCache = readCache('tp8-home-bootstrap-v16:' + host)
+        }
+        var bootBrand = window.__QD_BOOT_BRAND__ || {}
+        var siteName = String(bootBrand.siteName || resolveTrustedSiteName(siteContext, homeCache) || '').trim()
+        var notice = String(bootBrand.notice || siteContext.notice || homeCache.notice || '').trim()
+        var badgeText = String(bootBrand.badgeText || siteName.slice(0, 1) || '')
+        if (!badgeText.trim()) badgeText = '\u00A0'
+        var logo = normalizeAssetUrl(bootBrand.logo || siteContext.logo || homeCache.logo || '')
+
+        var titleEl = document.getElementById('boot-splash-title')
+        var noticeEl = document.getElementById('boot-splash-notice')
+        var badgeEl = document.getElementById('boot-splash-logo-badge')
+        var logoEl = document.getElementById('boot-splash-logo-image')
+        var authTitleEl = document.getElementById('boot-auth-site-title')
+        var authBadgeEl = document.getElementById('boot-auth-logo-badge')
+        var authLogoEl = document.getElementById('boot-auth-logo-image')
+
+        if (titleEl) titleEl.textContent = siteName
+        if (noticeEl) noticeEl.textContent = notice
+        if (badgeEl) badgeEl.textContent = badgeText
+        if (authTitleEl) authTitleEl.textContent = siteName
+        if (authBadgeEl) authBadgeEl.textContent = badgeText
+        if (logoEl) {
+          if (logo) {
+            logoEl.setAttribute('src', logo)
+            logoEl.style.display = 'block'
+            if (badgeEl) badgeEl.style.display = 'none'
+          } else {
+            logoEl.removeAttribute('src')
+            logoEl.style.display = 'none'
+            if (badgeEl) badgeEl.style.display = 'grid'
+          }
+        }
+        if (authLogoEl) {
+          if (logo) {
+            authLogoEl.setAttribute('src', logo)
+            authLogoEl.style.display = 'block'
+            if (authBadgeEl) authBadgeEl.style.display = 'none'
+          } else {
+            authLogoEl.removeAttribute('src')
+            authLogoEl.style.display = 'none'
+            if (authBadgeEl) authBadgeEl.style.display = 'grid'
+          }
+        }
+
+        document.title = siteName
+        applyFavicon(logo)
+        if (shouldWarmHomeAssets()) {
+          warmHomeImages(homeCache)
+        }
+      })()
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
