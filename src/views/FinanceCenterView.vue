@@ -137,7 +137,7 @@ import FeedbackToast from '@/components/FeedbackToast.vue'
 defineOptions({ name: 'FinanceCenterView' })
 import { computed, onActivated, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { apiFinanceOrders, apiFinanceRecharge, apiFinanceRechargeDetail, apiFinanceSummary, apiFinanceWithdrawal, apiFinanceWithdrawalPreview } from '../api/finance'
+import { apiFinanceOrders, apiFinanceRecharge, apiFinanceRechargeDetail, apiFinanceSummary, apiFinanceWithdrawalPreview } from '../api/finance'
 import { getSessionCache, removeSessionCache, setSessionCache } from '../utils/storage'
 import { useUserStore } from '../stores/user'
 
@@ -543,9 +543,8 @@ async function handleWithdrawCreate() {
   try {
     submittingWithdraw.value = true
     const usePointsDeduct = withdrawUsePointsDeduct.value && withdrawPointsEnabled.value ? 1 : 0
-    const res = await apiFinanceWithdrawal({ amount: amount.toFixed(2), use_points_deduct: usePointsDeduct })
     success.value = true
-    message.value = res.message || '已进入提现确认页'
+    message.value = '已进入提现确认页'
     await router.push({ name: 'finance-withdrawal', query: { amount: amount.toFixed(2), use_points_deduct: String(usePointsDeduct) } })
   } catch (error) {
     success.value = false
