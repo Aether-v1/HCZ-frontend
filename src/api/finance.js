@@ -37,10 +37,6 @@ export function apiFinanceRechargeSubmitImage(orderNumber, file) {
   })
 }
 
-export function apiFinanceWithdrawal(payload) {
-  return http.post('/api/finance/withdrawal', payload)
-}
-
 export function apiFinanceWithdrawalPreview(amount) {
   return http.get('/api/finance/withdrawal-preview', { params: { amount } })
 }
