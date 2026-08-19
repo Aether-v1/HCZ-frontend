@@ -11,6 +11,25 @@ const CSRF_EXEMPT_PATHS = [
 
 let csrfFetchPromise = null
 
+// RC-C: 防止多个并发 401 响应重复触发登录跳转
+let isHandlingAuthExpiry = false
+
+function handleAuthExpired() {
+  if (typeof window === 'undefined') return
+  if (isHandlingAuthExpiry) return
+  // 已在登录页则不跳转，避免循环
+  if (window.location.pathname === '/login') return
+
+  isHandlingAuthExpiry = true
+  try {
+    clearStoredCsrfToken()
+  } catch {
+    // ignore
+  }
+  // 全页跳转：自动清除 Pinia 内存状态，避免"假登录"
+  window.location.href = '/login'
+}
+
 function inferLegacyBase() {
   if (typeof window === 'undefined') return ''
   const runtimeBase = String(window.__TP8_API_BASE__ || '').trim()
@@ -178,6 +197,11 @@ http.interceptors.request.use(async (config) => {
 http.interceptors.response.use(
   (response) => {
     const normalized = normalizeResponse(response.data)
+    // RC-C: 后端可能返回 HTTP 200 但 body code=401（会话失效）
+    if (normalized.code === 401) {
+      handleAuthExpired()
+      return Promise.reject(normalized)
+    }
     if (!normalized.ok) {
       return Promise.reject(normalized)
     }
@@ -186,7 +210,15 @@ http.interceptors.response.use(
   (error) => {
     const payload = error?.response?.data
     const message = String(payload?.message || payload?.msg || '')
-    if (Number(error?.response?.status || payload?.code || 0) === 403 && message.includes('CSRF')) {
+    const httpStatus = Number(error?.response?.status || 0)
+    const bodyCode = Number(payload?.code || 0)
+
+    // RC-C: HTTP 401 或 body code=401 均表示会话失效
+    if (httpStatus === 401 || bodyCode === 401) {
+      handleAuthExpired()
+    }
+
+    if (httpStatus === 403 && message.includes('CSRF')) {
       clearStoredCsrfToken()
     }
     if (payload) {
@@ -195,8 +227,8 @@ http.interceptors.response.use(
     return Promise.reject({
       ok: false,
       success: false,
-      code: error?.response?.status || 500,
-      rawCode: error?.response?.status || 500,
+      code: httpStatus || 500,
+      rawCode: httpStatus || 500,
       status: 'error',
       message: error?.message || '网络请求失败',
       data: null
